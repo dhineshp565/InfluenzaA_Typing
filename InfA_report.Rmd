@@ -1,0 +1,37 @@
+---
+title: "Influenza A Typing Report" 
+date: "`r Sys.Date()`"
+output: html_document
+params:
+  csv: ""
+  
+---
+
+
+<br>
+
+Predicted using abricate tool with insaflu database as option. For more info please see https://github.com/tseemann/abricate and https://insaflu.insa.pt/
+
+## Influenza A HA and NA Sequences {.tabset}
+```{r, results='asis',echo=FALSE}
+samplelist <- read.csv(params$csv,header=FALSE,sep = ',')
+sampleid <- samplelist[,c(1)]
+
+for (i in sampleid){
+  
+  
+  cat("###", i, "\n")
+  fasta_id <- (paste(i,"_ORF.fasta",sep=""))
+  fasta_file <- read.csv(fasta_id,header = FALSE )
+  insa_id <- (paste(i,"_insaflu_typing.csv",sep=""))
+  
+  abricate_raw1 <- read.csv(insa_id,header = TRUE,sep="\t")
+  abricate_final1 <- abricate_raw1[,c(2,6,15,7,10,11,13,12)]
+  colnames(abricate_final1) <- c("SAMPLE ID","GENE","TYPE","COVERAGE","%COVERAGE","%IDENTITY","MATCH","DATABASE")
+  print(knitr::kable(abricate_final1,align = "llllcclr"))
+  print(knitr::kable(fasta_file,col.names = c("ORF SEQUENCE")))
+  cat("\n")
+  
+}
+```
+<br>
