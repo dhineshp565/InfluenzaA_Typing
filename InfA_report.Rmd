@@ -7,12 +7,17 @@ params:
   
 ---
 
+```{css, echo = FALSE}
+  .nav-pills>li>a:hover, .nav-pills>li>a:focus, .nav-pills>li.active>a,     .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus{
+     background-color: darkblue;
+     }
+```
 
 <br>
 
 Predicted using abricate tool with insaflu database as option. For more info please see https://github.com/tseemann/abricate and https://insaflu.insa.pt/
 
-## Influenza A HA and NA Sequences {.tabset}
+## Influenza A HA and NA Sequences {.tabset .tabset-pills}
 ```{r, results='asis',echo=FALSE}
 samplelist <- read.csv(params$csv,header=FALSE,sep = ',')
 sampleid <- samplelist[,c(1)]
