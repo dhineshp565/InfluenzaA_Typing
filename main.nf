@@ -72,7 +72,7 @@ process make_report {
 	input:
 	path(rmdfile)
 	path(typing_results)
-	path(orf)
+	path(cons)
 	path(samplelist)
 	
 	output:
@@ -83,7 +83,7 @@ process make_report {
 	"""
 	cp ${rmdfile} rmdfile_copy.Rmd
 	cp ${typing_results}/* ./
-	cp ${orf}/* ./
+	cp ${cons}/* ./
 	cp ${samplelist} sample.csv
 	Rscript -e 'rmarkdown::render(input="rmdfile_copy.Rmd",params=list(csv="sample.csv"),output_file="InfA_report.html")'
 
@@ -99,7 +99,7 @@ workflow {
 	insaflu(influenza_nano.out.cons,influenza_nano.out.csv)
 	orfipy(influenza_nano.out.cons,influenza_nano.out.csv)
 	rmdfile=file("${baseDir}/InfA_report.Rmd")
-	make_report(rmdfile,insaflu.out.type,orfipy.out,influenza_nano.out.csv)
+	make_report(rmdfile,insaflu.out.type,influenza_nano.out.cons,influenza_nano.out.csv)
 }
 
 	

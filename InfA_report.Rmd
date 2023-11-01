@@ -7,11 +7,7 @@ params:
   
 ---
 
-```{css, echo = FALSE}
-  .nav-pills>li>a:hover, .nav-pills>li>a:focus, .nav-pills>li.active>a,     .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus{
-     background-color: darkblue;
-     }
-```
+
 
 <br>
 
@@ -26,7 +22,7 @@ for (i in sampleid){
   
   
   cat("###", i, "\n")
-  fasta_id <- (paste(i,"_ORF.fasta",sep=""))
+  fasta_id <- (paste(i,"_InfA.fasta",sep=""))
   fasta_file <- read.csv(fasta_id,header = FALSE )
   insa_id <- (paste(i,"_insaflu_typing.csv",sep=""))
   
