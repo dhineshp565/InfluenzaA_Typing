@@ -39,7 +39,7 @@ process orfipy {
 	do 
 		sample=\$(echo \$lines|cut -f 1 -d ',')
 		orfipy ${cons}/\${sample}_InfA.fasta --dna \${sample}_ORF.fasta --min 400 --outdir orfipy_res --start ATG
-		sed '/>/ s/ORF.1.*/ORF/g' orfipy_res/\${sample}_ORF.fasta
+		sed -i '/>/ s/ORF.1.*/ORF/g' orfipy_res/\${sample}_ORF.fasta
 	done < ${csv}
 	"""
 
@@ -94,7 +94,7 @@ process make_report {
 
 process make_limsfile {
 	label "low"
-	publishDir "${params.outdir}/LIMS"
+	publishDir "${params.outdir}/LIMS",mode:"copy"
 	input:
 	path (typing_results)
 	path (orf)
@@ -107,9 +107,9 @@ process make_limsfile {
 	while read lines
 	do 
 		sample=\$(echo \$lines|cut -f 1 -d ',')
-		awk 'BEGIN{RS=">"}NR>1{sub("\n","\t"); gsub("\n",""); print RS\$0}' ${orf}/\${sample}_ORF.fasta > \${sample}_ORF.csv
+		seqkit fx2tab ${orf}/\${sample}_ORF.fasta > \${sample}_ORF.csv
 		sed -i '1i SEQ HEADER\tSEQUENCE' \${sample}_ORF.csv
-		paste ${typing_results}/\${sample}__insaflu_typing.csv \${sample}_ORF.csv > \${sample}_LIMS.csv
+		paste ${typing_results}/\${sample}_insaflu_typing.csv \${sample}_ORF.csv > \${sample}_LIMS.csv
 	done < ${csv}
 	
 	awk 'FNR==1 && NR!=1 { while (/^#F/) getline; } 1 {print}' *LIMS.csv > LIMS_file.csv
