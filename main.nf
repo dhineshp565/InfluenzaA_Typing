@@ -38,14 +38,15 @@ process orfipy {
 	while read lines
 	do 
 		sample=\$(echo \$lines|cut -f 1 -d ',')
-		orfipy ${cons}/\${sample}_InfA.fasta --dna \${sample}_ORF.fasta --min 540 --outdir orfipy_res --start ATG
+		orfipy ${cons}/\${sample}_InfA.fasta --dna \${sample}_ORF.fasta --min 400 --outdir orfipy_res --start ATG
+		sed '/>/ s/ORF.1.*/ORF/g' orfipy_res/\${sample}_ORF.fasta
 	done < ${csv}
 	"""
 
 }
 
 process insaflu {
-	label "high"
+	label "medium"
 	publishDir "${params.outdir}/insaflu",mode:"copy"
 	input:
 	path (cons)
@@ -67,7 +68,7 @@ process insaflu {
 }
 
 process make_report {
-	label "high"
+	label "medium"
 	publishDir "${params.outdir}/reports",mode:"copy"
 	input:
 	path(rmdfile)
@@ -91,6 +92,32 @@ process make_report {
 
 }
 
+process make_limsfile {
+	label "low"
+	publishDir "${params.outdir}/LIMS"
+	input:
+	path (typing_results)
+	path (orf)
+	path (csv)
+	output:
+	path("LIMS_file.csv")
+
+	script:
+	"""
+	while read lines
+	do 
+		sample=\$(echo \$lines|cut -f 1 -d ',')
+		awk 'BEGIN{RS=">"}NR>1{sub("\n","\t"); gsub("\n",""); print RS\$0}' ${orf}/\${sample}_ORF.fasta > \${sample}_ORF.csv
+		sed -i '1i SEQ HEADER\tSEQUENCE' \${sample}_ORF.csv
+		paste ${typing_results}/\${sample}__insaflu_typing.csv \${sample}_ORF.csv > \${sample}_LIMS.csv
+	done < ${csv}
+	
+	awk 'FNR==1 && NR!=1 { while (/^#F/) getline; } 1 {print}' *LIMS.csv > LIMS_file.csv
+	"""
+
+
+}
+
 workflow {
 	
 	data=Channel
@@ -100,6 +127,7 @@ workflow {
 	orfipy(influenza_nano.out.cons,influenza_nano.out.csv)
 	rmdfile=file("${baseDir}/InfA_report.Rmd")
 	make_report(rmdfile,insaflu.out.type,influenza_nano.out.cons,influenza_nano.out.csv)
+	make_limsfile (insaflu.out.type,orfipy.out,influenza_nano.out.csv)
 }
 
 	
