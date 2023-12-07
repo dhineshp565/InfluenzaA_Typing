@@ -1,7 +1,7 @@
 # InfluenzaNanopore
 
 ## Description
-This is the nextflow version of https://github.com/jimmyliu1326/InfluenzaNanopore with insflu typing and ORF generation
+This is the nextflow version of https://github.com/jimmyliu1326/InfluenzaNanopore with Influenza typing and ORF generation
 
 ## Usage
 ```
