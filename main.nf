@@ -46,7 +46,7 @@ process orfipy {
 }
 
 process insaflu {
-	label "medium"
+	label "low"
 	publishDir "${params.outdir}/insaflu",mode:"copy"
 	input:
 	path (cons)
@@ -68,7 +68,7 @@ process insaflu {
 }
 
 process make_report {
-	label "medium"
+	label "low"
 	publishDir "${params.outdir}/reports",mode:"copy"
 	input:
 	path(rmdfile)
@@ -84,7 +84,7 @@ process make_report {
 	"""
 	cp ${rmdfile} rmdfile_copy.Rmd
 	cp ${typing_results}/* ./
-	cp ${cons}/* ./
+	cp ${cons}/*_ORF.fasta ./
 	cp ${samplelist} sample.csv
 	Rscript -e 'rmarkdown::render(input="rmdfile_copy.Rmd",params=list(csv="sample.csv"),output_file="InfA_report.html")'
 
@@ -126,7 +126,7 @@ workflow {
 	insaflu(influenza_nano.out.cons,influenza_nano.out.csv)
 	orfipy(influenza_nano.out.cons,influenza_nano.out.csv)
 	rmdfile=file("${baseDir}/InfA_report.Rmd")
-	make_report(rmdfile,insaflu.out.type,influenza_nano.out.cons,influenza_nano.out.csv)
+	make_report(rmdfile,insaflu.out.type,orfipy.out,influenza_nano.out.csv)
 	make_limsfile (insaflu.out.type,orfipy.out,influenza_nano.out.csv)
 }
 
