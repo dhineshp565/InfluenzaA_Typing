@@ -18,7 +18,7 @@ process influenza_nano {
 	paste sample.csv paths.csv > samplelist.csv
 	sed -i 's/	/,/g' "samplelist.csv"
 	# run influenza pipeline
-	influenza_consensus.sh -t 10 -s 4,6 -i "samplelist.csv" -o . --mode dynamic --notrim
+	influenza_consensus.sh -t 16 -s 4,6 -i "samplelist.csv" -o . --mode dynamic --notrim
 	# move consensus for orfipy process
 	mkdir cons
 	while read lines;do sample=\$(echo \$lines|cut -f 1 -d ',');cat \${sample}/consensus/*.fa > "cons"/\${sample}_InfA.fasta;done < "samplelist.csv"
@@ -70,6 +70,7 @@ process insaflu {
 process make_report {
 	label "low"
 	publishDir "${params.outdir}/reports",mode:"copy"
+	publishDir "${params.out_dir}/",mode:"copy"
 	input:
 	path(rmdfile)
 	path(typing_results)
