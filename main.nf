@@ -1,4 +1,5 @@
 #!/usr/bin/env nextflow
+nextflow.enable.dsl=2
 
 process influenza_nano {
 	label "high"
@@ -18,10 +19,22 @@ process influenza_nano {
 	paste sample.csv paths.csv > samplelist.csv
 	sed -i 's/	/,/g' "samplelist.csv"
 	# run influenza pipeline
-	influenza_consensus.sh -t 16 -s 4,6 -i "samplelist.csv" -o . --mode dynamic --notrim
+	influenza_consensus.sh -t 8 -s 4,6 -i "samplelist.csv" -o . --mode dynamic --notrim 
 	# move consensus for orfipy process
 	mkdir cons
-	while read lines;do sample=\$(echo \$lines|cut -f 1 -d ',');cat \${sample}/consensus/*.fa > "cons"/\${sample}_InfA.fasta;done < "samplelist.csv"
+	
+	while read lines
+	do 
+		sample=\$(echo \$lines|cut -f 1 -d ',')
+		count=\$(ls -1 \${sample}/consensus/*.fa 2>/dev/null | wc -l)
+		if [[ "\${count}" != "0" ]]
+		then
+			cat \${sample}/consensus/*.fa > "cons"/\${sample}_InfA.fasta
+		else
+			echo -e ">\${sample}_No_consensus" > "cons"/\${sample}_InfA.fasta
+		fi
+
+	done < samplelist.csv
 	"""
 }
 process orfipy {
@@ -39,7 +52,12 @@ process orfipy {
 	do 
 		sample=\$(echo \$lines|cut -f 1 -d ',')
 		orfipy ${cons}/\${sample}_InfA.fasta --dna \${sample}_ORF.fasta --min 400 --outdir orfipy_res --start ATG
-		sed -i '/>/ s/ORF.1.*/ORF/g' orfipy_res/\${sample}_ORF.fasta
+		if [ \$(wc -l < orfipy_res/"\${sample}_ORF.fasta") -eq "0" ]
+		then 
+			echo -e ">\${sample}_No_consensus" > orfipy_res/\${sample}_ORF.fasta
+		else
+			sed -i '/>/ s/ORF.1.*/ORF/g' orfipy_res/\${sample}_ORF.fasta
+		fi
 	done < ${csv}
 	"""
 
