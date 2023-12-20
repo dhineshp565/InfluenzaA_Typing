@@ -21,20 +21,7 @@ process influenza_nano {
 	# run influenza pipeline
 	influenza_consensus.sh -t 8 -s 4,6 -i "samplelist.csv" -o . --mode dynamic --notrim 
 	# move consensus for orfipy process
-	mkdir cons
-	
-	while read lines
-	do 
-		sample=\$(echo \$lines|cut -f 1 -d ',')
-		count=\$(ls -1 \${sample}/consensus/*.fa 2>/dev/null | wc -l)
-		if [[ "\${count}" != "0" ]]
-		then
-			cat \${sample}/consensus/*.fa > "cons"/\${sample}_InfA.fasta
-		else
-			echo -e ">\${sample}_No_consensus" > "cons"/\${sample}_InfA.fasta
-		fi
-
-	done < samplelist.csv
+	prepare_consensus.sh
 	"""
 }
 process orfipy {
@@ -47,18 +34,7 @@ process orfipy {
 	path ("orfipy_res")
 	script:
 	"""
-	# Uses orfipy to make consensus with ATG as a start codon
-	while read lines
-	do 
-		sample=\$(echo \$lines|cut -f 1 -d ',')
-		orfipy ${cons}/\${sample}_InfA.fasta --dna \${sample}_ORF.fasta --min 400 --outdir orfipy_res --start ATG
-		if [ \$(wc -l < orfipy_res/"\${sample}_ORF.fasta") -eq "0" ]
-		then 
-			echo -e ">\${sample}_No_consensus" > orfipy_res/\${sample}_ORF.fasta
-		else
-			sed -i '/>/ s/ORF.1.*/ORF/g' orfipy_res/\${sample}_ORF.fasta
-		fi
-	done < ${csv}
+	orfy.sh ${cons} ${csv}
 	"""
 
 }
@@ -74,13 +50,7 @@ process insaflu {
 	path("typing_summary.csv"),emit:summary
 	script:
 	"""
-	mkdir typing_results
-	while read lines
-	do 
-		sample=\$(echo \$lines|cut -f 1 -d ',')
-		abricate --db insaflu -minid 70 -mincov 60 --quiet ${cons}/\${sample}_InfA.fasta > typing_results/\${sample}_insaflu_typing.csv
-	done < ${csv}
-	awk 'FNR==1 && NR!=1 { while (/^#F/) getline; } 1 {print}' typing_results/*typing.csv > typing_summary.csv
+	insaflu.sh ${cons} ${csv}
 	
 	"""
 }
