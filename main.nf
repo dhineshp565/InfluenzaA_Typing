@@ -3,7 +3,7 @@ nextflow.enable.dsl=2
 
 process influenza_nano {
 	label "high"
-	publishDir "${params.outdir}/infa",mode:"copy"
+	publishDir "${params.out_dir}/infa",mode:"copy"
 	input:
 	path(fastq_input)
 	output:
@@ -23,7 +23,7 @@ process influenza_nano {
 }
 process orfipy {
 	label "low"
-	publishDir "${params.outdir}/orf",mode:"copy"
+	publishDir "${params.out_dir}/orf",mode:"copy"
 	input:
 	path(cons)
 	path(csv)
@@ -38,7 +38,7 @@ process orfipy {
 
 process insaflu {
 	label "low"
-	publishDir "${params.outdir}/insaflu",mode:"copy"
+	publishDir "${params.out_dir}/insaflu",mode:"copy"
 	input:
 	path (cons)
 	path (csv)
@@ -54,7 +54,6 @@ process insaflu {
 
 process make_report {
 	label "low"
-	publishDir "${params.outdir}/reports",mode:"copy"
 	publishDir "${params.out_dir}/",mode:"copy"
 	input:
 	path(rmdfile)
@@ -80,7 +79,7 @@ process make_report {
 
 process make_limsfile {
 	label "low"
-	publishDir "${params.outdir}/LIMS",mode:"copy"
+	publishDir "${params.out_dir}/LIMS",mode:"copy"
 	input:
 	path (typing_results)
 	path (orf)
