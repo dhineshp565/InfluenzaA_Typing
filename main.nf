@@ -19,7 +19,7 @@ process influenza_nano {
 	paste sample.csv paths.csv > samplelist.csv
 	sed -i 's/	/,/g' "samplelist.csv"
 	# run influenza pipeline
-	influenza_consensus.sh -t 8 -s 4,6 -i "samplelist.csv" -o . --mode dynamic --notrim 
+	influenza_consensus.sh -t 8 -s 4,6 -i "samplelist.csv" -o . --mode dynamic --notrim -m r1041_e82_400bps_sup_v4.2.0	
 	# move consensus for orfipy process
 	prepare_consensus.sh
 	"""
