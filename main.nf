@@ -13,11 +13,8 @@ process influenza_nano {
 	val("sample"),emit:sample
 	script:
 	"""
-	# make csvfile
-	ls -1 ${fastq_input} > sample.csv
-	realpath ${fastq_input}/* > paths.csv
-	paste sample.csv paths.csv > samplelist.csv
-	sed -i 's/	/,/g' "samplelist.csv"
+	#make csv
+	makecsv.sh ${fastq_input}
 	# run influenza pipeline
 	influenza_consensus.sh -t 8 -s 4,6 -i "samplelist.csv" -o . --mode dynamic --notrim -m r1041_e82_400bps_sup_v4.2.0	
 	# move consensus for orfipy process
@@ -93,15 +90,7 @@ process make_limsfile {
 
 	script:
 	"""
-	while read lines
-	do 
-		sample=\$(echo \$lines|cut -f 1 -d ',')
-		seqkit fx2tab ${orf}/\${sample}_ORF.fasta > \${sample}_ORF.csv
-		sed -i '1i SEQ HEADER\tSEQUENCE' \${sample}_ORF.csv
-		paste ${typing_results}/\${sample}_insaflu_typing.csv \${sample}_ORF.csv > \${sample}_LIMS.csv
-	done < ${csv}
-	
-	awk 'FNR==1 && NR!=1 { while (/^#F/) getline; } 1 {print}' *LIMS.csv > LIMS_file.csv
+	make_lims.sh ${orf} ${typing_results} ${csv}
 	"""
 
 
