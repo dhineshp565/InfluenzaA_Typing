@@ -86,6 +86,7 @@ process make_limsfile {
 	path (csv)
 	output:
 	path("LIMS_file.csv")
+	path("normalised_orf"),emit:orf
 
 	script:
 	"""
@@ -103,8 +104,8 @@ workflow {
 	insaflu(influenza_nano.out.cons,influenza_nano.out.csv)
 	orfipy(influenza_nano.out.cons,influenza_nano.out.csv)
 	rmdfile=file("${baseDir}/InfA_report.Rmd")
-	make_report(rmdfile,insaflu.out.type,orfipy.out,influenza_nano.out.csv)
 	make_limsfile (insaflu.out.type,orfipy.out,influenza_nano.out.csv)
+	make_report(rmdfile,insaflu.out.type,make_limsfile.out.orf,influenza_nano.out.csv)
 }
 
 	
