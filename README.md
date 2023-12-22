@@ -24,7 +24,7 @@ nextflow run main.nf --input path_to_fastq_dir/ --out_dir path_to_output_folder
 * nextflow
 * docker
 * wsl2
-## Docker images 
+## Docker images and versions used in this pipeline
 * orfipy (quay.io/biocontainers/orfipy:0.0.4--py310h0dbaff4_2)
 * abricate with insaflu (staphb/abricate:1.0.1-insaflu-220727)
 * seqkit (quay.io/biocontainers/seqkit:2.5.1--h9ee0642_0)
