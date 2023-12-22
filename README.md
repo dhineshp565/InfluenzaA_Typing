@@ -1,4 +1,4 @@
-# InfluenzaNanopore
+# Influenza A HA and NA Typing pipeline
 
 ## Description
 Pipeline for generating consensus sequences and typing of HA and NA fragments from Influenza A virus using sequencing data generated from Oxford Nanopore Sequencing platform 
