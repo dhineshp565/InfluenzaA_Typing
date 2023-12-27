@@ -14,4 +14,4 @@ while read lines
 		paste $2/${sample}_insaflu_typing.csv ${sample}_ORF.csv > ${sample}_LIMS.csv
 done < $3
 	
-awk 'FNR==1 && NR!=1 { while (/^#F/) getline; } 1 {print}' *LIMS.csv > LIMS_file.csv
+awk 'FNR==1 && NR!=1 { while (/^#F/) getline; } 1 {print}' *LIMS.csv > InfA_LIMS_file.csv
