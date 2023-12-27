@@ -85,7 +85,7 @@ process make_limsfile {
 	path (orf)
 	path (csv)
 	output:
-	path("LIMS_file.csv")
+	path("InfA_LIMS_file.csv")
 	path("normalised_orf"),emit:orf
 
 	script:
